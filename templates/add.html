@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Add Student{% endblock %}
+
+{% block content %}
+
+  <section class="panel form-panel">
+    <div class="panel-head">
+      <h2>Add student</h2>
+    </div>
+
+    <form action="{{ url_for('add_student') }}" method="post">
+      <div class="field-row">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="field">
+          <label>Roll No</label>
+          <input type="text" name="roll_no" required>
+        </div>
+        <div class="field">
+          <label>Class</label>
+          <select name="student_class" required>
+            {% for c in ['1', '2', '3', '4', '5'] %}
+            <option value="{{ c }}">Class {{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <h3>Subjects</h3>
+      <table id="subject-table">
+        <thead>
+          <tr><th>Subject name</th><th>Marks (0-100)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" name="subject_name"></td>
+            <td><input type="number" name="subject_marks" min="0" max="100"></td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" class="btn-ghost" onclick="addSubjectRow()">+ Add another subject</button>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-pill">Save student</button>
+        <a href="{{ url_for('index') }}" class="muted">Cancel</a>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    function addSubjectRow() {
+      var tbody = document.querySelector("#subject-table tbody");
+      var row = document.createElement("tr");
+      row.innerHTML =
+        '<td><input type="text" name="subject_name"></td>' +
+        '<td><input type="number" name="subject_marks" min="0" max="100"></td>';
+      tbody.appendChild(row);
+    }
+  </script>
+
+{% endblock %}

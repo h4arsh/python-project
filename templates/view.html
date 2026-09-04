@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }}{% endblock %}
+
+{% block content %}
+
+  <section class="panel student-header">
+    <div>
+      <h1>{{ student.name }}</h1>
+      <p class="muted">Roll No {{ student.roll_no }} &middot; Class {{ student.student_class }}</p>
+    </div>
+    <div class="ring" style="--pct: {{ result.percentage }};">
+      <span>{{ result.percentage }}%</span>
+    </div>
+  </section>
+
+  <div class="dash-grid">
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Marks by subject</h2>
+        <span class="muted">Compared to class average</span>
+      </div>
+      <canvas id="studentChart" height="220"></canvas>
+    </section>
+
+    <section class="panel summary-panel">
+      <div class="panel-head">
+        <h2>Summary</h2>
+      </div>
+      <div class="summary-row">
+        <span class="muted">Total marks</span>
+        <span>{{ result.total }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="muted">Percentage</span>
+        <span>{{ result.percentage }}%</span>
+      </div>
+      <div class="summary-row">
+        <span class="muted">Grade</span>
+        <span class="grade-pill grade-{{ result.grade[0] }}">{{ result.grade }}</span>
+      </div>
+      <div class="summary-row">
+        <span class="muted">Subjects</span>
+        <span>{{ student.subjects|length }}</span>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="page-links">
+    <a href="{{ url_for('edit_student', student_id=student.id) }}">Edit this student</a>
+    <a href="{{ url_for('index') }}">Back to dashboard</a>
+  </p>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const subjectLabels = {{ student.subjects.keys() | list | tojson }};
+  const studentMarks = {{ student.subjects.values() | list | tojson }};
+  const classAverages = {{ class_averages | tojson }};
+  const avgLookup = {};
+  classAverages.forEach(item => { avgLookup[item.subject] = item.average; });
+  const classData = subjectLabels.map(s => avgLookup[s] !== undefined ? avgLookup[s] : null);
+
+  new Chart(document.getElementById('studentChart'), {
+    type: 'bar',
+    data: {
+      labels: subjectLabels,
+      datasets: [
+        {
+          label: '{{ student.name }}',
+          data: studentMarks,
+          backgroundColor: '#5b6eea',
+          borderRadius: 6,
+          maxBarThickness: 28
+        },
+        {
+          label: 'Class average',
+          data: classData,
+          backgroundColor: '#7c8ff3',
+          borderRadius: 6,
+          maxBarThickness: 28
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#e6e9fb' } }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { color: '#a6adcf' },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        },
+        x: {
+          ticks: { color: '#a6adcf' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dashboard{% endblock %} - Student Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">SR</span>
+      <span class="brand-name">Student Results</span>
+    </div>
+
+    <nav class="side-nav">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if active_page == 'dashboard' else '' }}">
+        <span class="nav-icon">&#9635;</span> Dashboard
+      </a>
+      <a href="{{ url_for('add_student') }}" class="{{ 'active' if active_page == 'add' else '' }}">
+        <span class="nav-icon">&#43;</span> Add Student
+      </a>
+      {% for c in ['1', '2', '3', '4', '5'] %}
+      <a href="{{ url_for('class_dashboard', class_name=c) }}" class="{{ 'active' if active_page == 'class_' ~ c else '' }}">
+        <span class="nav-icon">&#9636;</span> Class {{ c }}
+      </a>
+      {% endfor %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <p class="muted">Student Result<br>Management System</p>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <header class="topbar">
+      <form action="{{ url_for('search') }}" method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search by name or roll no" value="{{ query|default('') }}">
+        <button type="submit">Search</button>
+      </form>
+      <a href="{{ url_for('add_student') }}" class="btn-pill">+ Add Student</a>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+
+  </div>
+
+</div>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

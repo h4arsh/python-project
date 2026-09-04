@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Class {{ class_name }} Dashboard{% endblock %}
+
+{% block content %}
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Class {{ class_name }}</h1>
+      <p>{{ student_count }} student{{ 's' if student_count != 1 else '' }}, averaging {{ class_average }}% across every subject.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ student_count }}</span>
+        <span class="hero-stat-label">Students</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ class_average }}%</span>
+        <span class="hero-stat-label">Class average</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ subject_averages|length }}</span>
+        <span class="hero-stat-label">Subjects tracked</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="dash-grid">
+
+    <section class="panel performance-panel">
+      <div class="panel-head">
+        <h2>Class {{ class_name }} performance by subject</h2>
+        <span class="muted">Average marks, this class</span>
+      </div>
+      <canvas id="subjectChart" height="220"></canvas>
+    </section>
+
+    <section class="panel performers-panel">
+      <div class="panel-head">
+        <h2>Top performers</h2>
+        <span class="muted">Class {{ class_name }}, by percentage</span>
+      </div>
+      <div class="ring-grid">
+        {% for s in top_performers %}
+        <div class="ring-item">
+          <div class="ring" style="--pct: {{ s.result.percentage }};">
+            <span>{{ s.result.percentage }}%</span>
+          </div>
+          <p class="ring-name">{{ s.name }}</p>
+          <p class="muted ring-roll">{{ s.roll_no }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+
+  <section class="panel students-panel">
+    <div class="panel-head">
+      <h2>Class {{ class_name }} rankings</h2>
+      <span class="muted">Sorted by percentage, top to bottom</span>
+    </div>
+
+    {% if students %}
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Total</th>
+          <th>Percentage</th>
+          <th>Grade</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ s.roll_no }}</td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.result.total }}</td>
+          <td>{{ s.result.percentage }}%</td>
+          <td><span class="grade-pill grade-{{ s.result.grade[0] }}">{{ s.result.grade }}</span></td>
+          <td class="actions">
+            <a href="{{ url_for('view_student', student_id=s.id) }}">View</a>
+            <a href="{{ url_for('edit_student', student_id=s.id) }}">Edit</a>
+            <form action="{{ url_for('delete_student', student_id=s.id) }}" method="post"
+                  onsubmit="return confirm('Delete {{ s.name }}?');">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="muted">No students in this class yet.</p>
+    {% endif %}
+  </section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const ctx = document.getElementById('subjectChart');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ subject_averages | map(attribute='subject') | list | tojson }},
+      datasets: [{
+        label: 'Average marks',
+        data: {{ subject_averages | map(attribute='average') | list | tojson }},
+        backgroundColor: '#5b6eea',
+        borderRadius: 6,
+        maxBarThickness: 42
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { color: '#a6adcf' },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        },
+        x: {
+          ticks: { color: '#a6adcf' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}
