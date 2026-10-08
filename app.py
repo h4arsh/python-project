@@ -58,11 +58,11 @@ def index():
     )
 
 
-CLASSES = ["1", "2", "3", "4", "5"]
+CLASSES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 
 
 def build_class_sections(students):
-    """Group students by class (1-5), each sorted by percentage (top to bottom)."""
+    """Group students by class (1-10), each sorted by percentage (top to bottom)."""
     sections = []
     for cls in CLASSES:
         members = [s for s in students if str(s.get("student_class", "")) == cls]
