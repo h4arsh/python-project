@@ -15,10 +15,11 @@ pipeline {
             steps {
                 echo 'Installing Python dependencies'
 
-                sh '''
-                    python3 --version
-                    python3 -m venv .venv
-                    .venv/bin/pip install -r requirements.txt
+                bat '''
+                    python --version
+                    python -m venv .venv
+                    .venv\\Scripts\\python -m pip install --upgrade pip
+                    .venv\\Scripts\\pip install -r requirements.txt
                 '''
             }
         }
@@ -27,9 +28,9 @@ pipeline {
             steps {
                 echo 'Testing Python application'
 
-                sh '''
-                    .venv/bin/python -m compileall -q .
-                    .venv/bin/python -m pytest -q
+                bat '''
+                    .venv\\Scripts\\python -m compileall -q .
+                    .venv\\Scripts\\python -m pytest -q
                 '''
             }
         }
