@@ -27,7 +27,8 @@ from data_handler import (
 )
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-key"  # needed only for flash messages
+app.secret_key = "dev-secret-key"  # needed only for flash
+print("Jenkins CI/CD testing")
 
 
 @app.route("/")
