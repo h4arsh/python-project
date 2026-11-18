@@ -2,6 +2,14 @@ pipeline {
 
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
+    environment {
+        PYTHON = 'C:\\Program Files\\Python312\\python.exe'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -16,10 +24,10 @@ pipeline {
                 echo 'Installing Python dependencies'
 
                 bat '''
-                    python --version
-                    python -m venv .venv
+                    "%PYTHON%" --version
+                    "%PYTHON%" -m venv .venv
                     .venv\\Scripts\\python -m pip install --upgrade pip
-                    .venv\\Scripts\\pip install -r requirements.txt
+                    .venv\\Scripts\\python -m pip install -r requirements.txt
                 '''
             }
         }
